@@ -12,7 +12,7 @@ BEGIN {
     gsub("{", "{\n", $0)
 
     for(i=1;i<NF;i++){
-        if(match($i, "(.*?):.*{", g)) {
+        if(match($i, "(.*?):.*{")) {
             key[k_index++] = substr($i, RSTART, RLENGTH-2)
         }else if($i ~ /\}/) {
             delete key[--k_index]
@@ -34,9 +34,10 @@ END {
     flag=0
     l_length=length(out)
     for(k=0;k<l_length;k++){
-        if(match(out[k], path":(.*)", g)){
+        if(match(out[k], path":(.*)")){
             flag=1
-            print g[1]
+            value=substr(out[k], RSTART+length(path)+1) # +1 bcz of ':'
+            print value
         }
     }
     if(!flag)
