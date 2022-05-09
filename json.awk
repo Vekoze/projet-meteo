@@ -7,14 +7,13 @@ BEGIN {
 }
 
 {
-    gsub("[\" ]|^.|.$","",$0)
-    gsub("}\\]?,?","}\n",$0)
+    gsub("[\\]\\[\" ]|^.|.$","",$0)
     gsub(",","\n",$0)
-    gsub("\\[?{", "{\n", $0)
+    gsub("{", "{\n", $0)
 
     for(i=1;i<NF;i++){
         if(match($i, "(.*?):.*{", g)) {
-            key[k_index++] = g[1]
+            key[k_index++] = substr($i, RSTART, RLENGTH-2)
         }else if($i ~ /\}/) {
             delete key[--k_index]
         }else{
