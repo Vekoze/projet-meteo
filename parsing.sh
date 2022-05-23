@@ -39,15 +39,15 @@ get_new_mean(){
     local file=$1
     local new_value=$2
 
-    if [ ! $n -eq 0 ]
+    if [ ! $n -eq 1 ]
     then
         local last_n=$(($n-1))
         local last_mean=$(get_current_mean $file)
         
         local old_values=$( echo $last_mean*$last_n | bc )
         local new_values=$( echo $old_values+$new_value | bc)
-        
-        echo $( echo $new_values/$n | bc)
+
+        echo $( echo "scale=1; $new_values / $n" | bc)
     else
         echo $new_value
     fi
@@ -62,7 +62,7 @@ sky=$(get_value "weather.main")
 minutes=$(get_minutes | bc)
 hours=$(get_hours | bc)
 
-n=$( echo $minutes/5 | bc )
+n=$( echo $minutes/5 + 1 | bc )
 
 if [ ! -f temperature ] 
 then
@@ -88,13 +88,10 @@ then
     echo "|-------|------|" >> sky
 fi
 
-echo `get_current_mean temperature`
-get_new_mean temperature 12.5
+new_mean=$(get_new_mean temperature 12.5)
+echo $new_mean
 
-#temp_mean=$(get_new_mean temperature $temperature)
-#humidity_mean=$(get_new_mean humidity $humidity)
-
-#if [ $n -eq 0 ]
-#then
-#    fwrite $hours $sky sky
-#fi
+if [ $n -eq 0 ]
+then
+    fwrite $hours $sky sky
+fi
