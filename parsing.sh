@@ -25,9 +25,19 @@ k_to_c(){
     echo $input-$K | bc   
 }
 
-fwrite(){
+fwrite_temperature(){
+    local file=$3
+    printf "| %-6s| %-12s|\n" $1 $2 >> $file
+}
+
+fwrite_humidity(){
     local file=$3
     printf "| %-6s| %-9s|\n" $1 $2 >> $file
+}
+
+fwrite_sky(){
+    local file=$3
+    printf "| %-6s| %-5s|\n" $1 $2 >> $file
 }
 
 get_current_mean(){
@@ -39,11 +49,11 @@ get_new_mean(){
     local file=$1
     local new_value=$2
 
-    if [ ! $n -eq 1 ]
+    if [ $n -ne 1 ]
     then
         local last_n=$(($n-1))
         local last_mean=$(get_current_mean $file)
-        
+
         local old_values=$( echo $last_mean*$last_n | bc )
         local new_values=$( echo $old_values+$new_value | bc)
 
@@ -67,31 +77,39 @@ n=$( echo $minutes/5 + 1 | bc )
 if [ ! -f temperature ] 
 then
     touch temperature
-    echo "## Température\n" >> temperature
-    echo "| Heure | Température |" >> temperature
-    echo "|-------|-------------|" >> temperature
+    printf "\n## Température\n" >> temperature
+    printf "| Heure | Température |\n" >> temperature
+    printf "|-------|-------------|\n" >> temperature
 fi
 
 if [ ! -f humidity ] 
 then
     touch humidity
-    echo "## Humidité\n" >> humidity
-    echo "| Heure | Humidité |" >> humidity
-    echo "|-------|----------|" >> humidity
+    printf "\n## Humidité\n" >> humidity
+    printf "| Heure | Humidité |\n" >> humidity
+    printf "|-------|----------|\n" >> humidity
 fi
 
 if [ ! -f sky ] 
 then
     touch sky
-    echo "## Ciel\n" >> sky
-    echo "| Heure | Ciel |" >> sky
-    echo "|-------|------|" >> sky
+    printf "\n## Ciel\n" >> sky
+    printf "| Heure | Ciel |\n" >> sky
+    printf "|-------|------|\n" >> sky
 fi
 
-new_mean=$(get_new_mean temperature 12.5)
-echo $new_mean
+new_mean_temperature=$(get_new_mean temperature $temperature)
+new_mean_humidity=$(get_new_mean humidity $humidity)
 
-if [ $n -eq 0 ]
+if [ $n -eq 1 ]
 then
-    fwrite $hours $sky sky
+    fwrite_temperature $hours $new_mean_temperature temperature
+    fwrite_humidity $hours $new_mean_humidity humidity
+    fwrite_sky $hours $sky sky
+else
+    #sed -i '$ d' temperature
+    fwrite_temperature $hours $new_mean_temperature temperature
+
+    #sed -i '$ d' humidity
+    fwrite_humidity $hours $new_mean_humidity humidity
 fi
