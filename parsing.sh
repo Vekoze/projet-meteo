@@ -30,7 +30,7 @@ fwrite(){
     printf "| %-6s| %-9s|\n" $1 $2 >> $file
 }
 
-get_mean(){
+get_current_mean(){
     local file=$1
     echo `cat $file | egrep -o "[0-9]+(\.[0-9]+)" | tail -1`
 }
@@ -39,26 +39,17 @@ get_new_mean(){
     local file=$1
     local new_value=$2
 
-    local last_n=$(($n-1))   
-    local last_mean=$(get_mean $file)
-    
-    local old_values=$( echo $last_mean*$last_n | bc )
-    local new_values=$( echo $old_values+$new_value | bc)
-     
     if [ ! $n -eq 0 ]
     then
+        local last_n=$(($n-1))
+        local last_mean=$(get_current_mean $file)
+        
+        local old_values=$( echo $last_mean*$last_n | bc )
+        local new_values=$( echo $old_values+$new_value | bc)
+        
         echo $( echo $new_values/$n | bc)
     else
         echo $new_value
-    fi
-}
-
-create_if_not_exists(){
-    local file=$1
-    
-    if [ ! -f $file ] 
-    then
-        touch $file
     fi
 }
 
@@ -73,26 +64,37 @@ hours=$(get_hours | bc)
 
 n=$( echo $minutes/5 | bc )
 
-create_if_not_exists temperature
-create_if_not_exists humidity
-create_if_not_exists sky
-
-echo "## Température\n" >> temperature
-echo "| Heure | Température |" >> temperature
-echo "|-------|-------------|" >> temperature
-
-echo "## Humidité\n" >> humidity
-echo "| Heure | Humidité |" >> humidity
-echo "|-------|----------|" >> humidity
-
-echo "## Ciel\n" >> sky
-echo "| Heure | Ciel |" >> sky
-echo "|-------|------|" >> sky
-
-temp_mean=$(get_new_mean temperature $temperature)
-humidity_mean=$(get_new_mean humidity $humidity)
-
-if [ $n -eq 0 ]
+if [ ! -f temperature ] 
 then
-    fwrite $hours $sky sky
+    touch temperature
+    echo "## Température\n" >> temperature
+    echo "| Heure | Température |" >> temperature
+    echo "|-------|-------------|" >> temperature
 fi
+
+if [ ! -f humidity ] 
+then
+    touch humidity
+    echo "## Humidité\n" >> humidity
+    echo "| Heure | Humidité |" >> humidity
+    echo "|-------|----------|" >> humidity
+fi
+
+if [ ! -f sky ] 
+then
+    touch sky
+    echo "## Ciel\n" >> sky
+    echo "| Heure | Ciel |" >> sky
+    echo "|-------|------|" >> sky
+fi
+
+echo `get_current_mean temperature`
+get_new_mean temperature 12.5
+
+#temp_mean=$(get_new_mean temperature $temperature)
+#humidity_mean=$(get_new_mean humidity $humidity)
+
+#if [ $n -eq 0 ]
+#then
+#    fwrite $hours $sky sky
+#fi
