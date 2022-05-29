@@ -11,6 +11,10 @@ get_json_value(){
     awk -v path=$key -f json.awk $WEATHER_PATH
 }
 
+get_minute(){
+    echo $(date +%M)
+}
+
 get_hour(){
     echo $(date +%H)
 }
@@ -33,6 +37,7 @@ sky=$(get_json_value "weather.main")
 
 time=$(get_time)
 hour=$(get_hour)
+minute=$(get_minute)
 
 if [ $hour -eq 0 ]
 then
@@ -43,7 +48,7 @@ fi
 
 if [ -f temperature ]; then > temperature; fi
 if [ -f humidity ]; then > humidity; fi
-if [ -f sky ]; then > sky; fi
+if [ $minute -eq 0 ] && [ -f sky ]; then > sky; fi
 
 printf "%s %s\n" $time $temperature >> temperature
 printf "%s %s\n" $time $humidity >> humidity
