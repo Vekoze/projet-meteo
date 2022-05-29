@@ -1,12 +1,18 @@
 #!/bin/sh
 
-temperature_min=14.4
-temperature_max=18.6
+temperature_min=`awk 'BEGIN{x=99} {if($2<x) x=$2} END{print x}' temperature`
+temperature_max=`awk 'BEGIN{x=0} {if($2>x) x=$2} END{print x}' temperature`
 
-humidity_min=49.9
-humidity_max=58.8
+humidity_min=`awk 'BEGIN{x=99} {if($2<x) x=$2} END{print x}' humidity`
+humidity_max=`awk 'BEGIN{x=0} {if($2>x) x=$2} END{print x}' humidity`
 
-global="Clear"
+global=`awk 'BEGIN{x=0} {arr[$2]++} {for(key in arr) if(x<arr[key]) k=key; x=arr[key]} END{print k}' sky`
+ 
+#echo $temperature_min
+#echo $temperature_max
+#echo $humidity_min
+#echo $humidity_max
+#echo $global
 
 cat <<EOT >> temperature.p
 reset
