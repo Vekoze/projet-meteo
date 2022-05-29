@@ -1,15 +1,41 @@
 #!/bin/sh
 
-echo "set terminal png size 800,500 enhanced background rgb 'white'" > temperature_gnuplot
-echo "set title 'temperature'" >> temperature_gnuplot
-echo "set xr [00:00:00:00]" >> temperature_gnuplot
-echo "set yr [$temperature_min:$temperature_max]" >> temperature_gnuplot
-echo "set output 'temperature_graph.png'" >> temperature_gnuplot
+temperature_min=14.4
+temperature_max=18.6
 
-gnuplot temperature_gnuplot
-gnuplot humidity_gnuplot
-gnuplot sky_gnuplot
+humidity_min=49.9
+humidity_max=58.8
 
-rm -f temperature_gnuplot
-rm -f humidity_gnuplot
-rm -f sky_gnuplot
+global="Clear"
+
+cat <<EOT >> temperature.p
+reset
+clear
+set title 'temperature'
+set terminal png size 800,500
+
+set xdata time
+set format x '%H:%M'
+set timefmt '%H:%M'
+
+set xrange ['00:00':*]
+set yrange [14:19]
+
+set xtics rotate
+set output 'graph/temperature_graph.png'
+plot 'temperature' using 1:2 with lines
+EOT
+
+cat <<EOT >> humidity.p
+EOT
+
+cat <<EOT >> sky.p
+EOT
+
+gnuplot temperature.p
+gnuplot humidity.p
+gnuplot sky.p
+
+rm -f temperature.p
+rm -f humidity.p
+rm -f sky.p
