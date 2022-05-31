@@ -8,7 +8,7 @@ fetch_weather_file(){
 
 get_json_value(){
     local key=$1
-    awk -v path=$key -f json.awk $WEATHER_PATH
+    awk -v path=$key -f $HOME/json.awk $WEATHER_PATH
 }
 
 get_minute(){
@@ -39,17 +39,6 @@ time=$(get_time)
 hour=$(get_hour)
 minute=$(get_minute)
 
-if [ $hour -eq 0 ]
-then
-    > temperature
-    > humidity
-    > sky
-fi
-
-if [ -f temperature ]; then > temperature; fi
-if [ -f humidity ]; then > humidity; fi
-if [ $minute -eq 0 ] && [ -f sky ]; then > sky; fi
-
 printf "%s %s\n" $time $temperature >> temperature
 printf "%s %s\n" $time $humidity >> humidity
-printf "%s %s\n" $time $sky >> sky
+if [ $minute -eq 0 ]; then printf "%s %s\n" $time $sky >> sky; fi
