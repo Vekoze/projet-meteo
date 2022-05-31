@@ -59,19 +59,22 @@ cat <<EOT >> sky.p
 set terminal png size 1300,150
 set output 'graph/sky.png'
 
-unset ytics
 set xtics font ", 8"
+unset ytics
+
 set xdata time
 set format x '%H:%M'
 set timefmt '%H:%M'
 
-set autoscale x
-set xrange ['00:00':*]
+set xtics ()
+set for [i=0:24:2] xtics add (sprintf("%3.0f:00", i%24) i*100)
+
+set xrange [0:2400]
 set yrange [0:100]
 
 set macros
 begin="binary filetype=png"
-end="dx=30 dy=0.3 with rgbalpha notitle"
+end="dx=1 dy=0.3 with rgbalpha notitle"
 EOT
 
 i=0
@@ -80,7 +83,7 @@ do
     line=`expr $i + 1`
     icon=$( sed -n "$line"p sky | awk '{print $3}' )
     if [ $i -eq 0 ];then echo -n "plot " >> sky.p; fi
-    x=`expr $i \* 3560`
+    x=`expr $i \* 100`
     echo -n "'ressource/$icon.png' @begin origin=($x,35) @end" >> sky.p
     if [ $i -ne 23 ];then echo ", \\" >> sky.p ;fi
     i=$(($i+1))
