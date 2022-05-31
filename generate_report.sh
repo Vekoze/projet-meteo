@@ -56,15 +56,35 @@ plot 'humidity' using 1:2 with lines
 EOT
 
 cat <<EOT >> sky.p
-set terminal png size 1100,140
+set terminal png size 1300,150
+set output 'graph/sky.png'
+
+unset ytics
+set xtics font ", 8"
 set xdata time
 set format x '%H:%M'
 set timefmt '%H:%M'
-set xrange ['00:00':*]
-set key off
-set output 'graph/sky.png'
-plot 'ressource/01d.png' binary filetype=png center=(10,30) dx=0.005 dy=0.005 with rgbimage notitle
+
+set xrange ['00:00':'23:00']
+set yrange [0:100]
+
+set macros
+begin="binary filetype=png"
+end="dx=30 dy=0.3 with rgbalpha notitle"
+
 EOT
+
+i=0
+while [ $i -ne 24 ]
+do
+    line=`expr $i + 1`
+    icon=$( sed -n "$line"p sky | awk '{print $3}' )
+    if [ $i -eq 0 ];then echo -n "plot " >> sky.p; fi
+    x=`expr $i \* 3450`
+    echo -n "'ressource/$icon.png' @begin origin=($x,35) @end" >> sky.p
+    if [ $i -ne 23 ];then echo ", \\" >> sky.p ;fi
+    i=$(($i+1))
+done
 
 gnuplot temperature.p
 gnuplot humidity.p
