@@ -22,6 +22,7 @@ lon=$(get_json_value "coord.lon")
 lat=$(get_json_value "coord.lat")
 date=`date +%d-%m-%Y`
 
+mkdir -p graph
 cat <<EOT >> temperature.p
 set title 'temperatures'
 set terminal png size 1000,350
@@ -59,20 +60,15 @@ set terminal png size 1100,140
 set xdata time
 set format x '%H:%M'
 set timefmt '%H:%M'
-set xrange ['00:00':'23:00']
+set xrange ['00:00':*]
 set key off
 set output 'graph/sky.png'
-plot 'sky' using 1:2
+plot 'ressource/01d.png' binary filetype=png center=(10,30) dx=0.005 dy=0.005 with rgbimage notitle
 EOT
 
 gnuplot temperature.p
 gnuplot humidity.p
 gnuplot sky.p
-
-rm -f temperature.p
-rm -f humidity.p
-rm -f sky.p
-
 
 > report.md
 cat << EOT >> report.md
@@ -114,4 +110,18 @@ header-includes: |
 EOT
 
 pandoc -V geometry:margin=1.2in -s -o report.pdf report.md
+
+# Cleanup
+
+rm -f temperature.p
+rm -f humidity.p
+rm -f sky.p
+
 rm -f report.md
+
+#rm -f temperature
+#rm -f humidity
+#rm -f sky
+
+#rm graph/*.png
+#rmdir graph
