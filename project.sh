@@ -34,6 +34,7 @@ fetch_weather_file
 temperature=$(kelvin_to_celsius $(get_json_value "main.temp"))
 humidity=$(get_json_value "main.humidity")
 sky=$(get_json_value "weather.main")
+sky_icon=$(get_json_value "weather.icon")
 
 time=$(get_time)
 hour=$(get_hour)
@@ -41,4 +42,4 @@ minute=$(get_minute)
 
 printf "%s %s\n" $time $temperature >> temperature
 printf "%s %s\n" $time $humidity >> humidity
-if [ $minute -eq 0 ]; then printf "%s %s\n" $time $sky >> sky; fi
+if [ $minute -eq 0 ]; then printf "%s %s\n" $time $sky $sky_icon >> sky; fi
