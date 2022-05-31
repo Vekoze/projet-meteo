@@ -65,13 +65,13 @@ set xdata time
 set format x '%H:%M'
 set timefmt '%H:%M'
 
-set xrange ['00:00':'23:00']
+set autoscale x
+set xrange ['00:00':*]
 set yrange [0:100]
 
 set macros
 begin="binary filetype=png"
 end="dx=30 dy=0.3 with rgbalpha notitle"
-
 EOT
 
 i=0
@@ -80,7 +80,7 @@ do
     line=`expr $i + 1`
     icon=$( sed -n "$line"p sky | awk '{print $3}' )
     if [ $i -eq 0 ];then echo -n "plot " >> sky.p; fi
-    x=`expr $i \* 3450`
+    x=`expr $i \* 3560`
     echo -n "'ressource/$icon.png' @begin origin=($x,35) @end" >> sky.p
     if [ $i -ne 23 ];then echo ", \\" >> sky.p ;fi
     i=$(($i+1))
