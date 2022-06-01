@@ -37,7 +37,7 @@ END {
     for(k=0;k<l_length;k++){
         if(match(out[k], path":(.*)")){
             flag=1
-            value=substr(out[k], RSTART+length(path)+1) # +1 bcz of ':'
+            value=substr(out[k], RSTART+length(path)+1)
             print value
         }
     }
