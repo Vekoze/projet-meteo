@@ -1,14 +1,8 @@
 #!/bin/sh
 
-readonly WEATHER_PATH="$HOME/weather.json"
-
-fetch_weather_file(){ 
-    scp -i ~/.ssh/id_rsa.pub venjal24@10.30.48.100:/tmp/weather.json $WEATHER_PATH
-}
-
 get_json_value(){
     local key=$1
-    awk -v path=$key -f $HOME/json.awk $WEATHER_PATH
+    awk -v path=$key -f $HOME/json.awk $HOME/weather.json
 }
 
 get_minute(){
@@ -29,7 +23,7 @@ kelvin_to_celsius(){
     echo $input-$K | bc
 }
 
-fetch_weather_file
+scp venjal24@10.30.48.100:/tmp/weather.json weather.json
 
 temperature=$(kelvin_to_celsius $(get_json_value "main.temp"))
 humidity=$(get_json_value "main.humidity")
