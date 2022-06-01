@@ -2,7 +2,7 @@
 
 get_json_value(){
     local key=$1
-    awk -v path=$key -f $HOME/json.awk $HOME/weather.json
+    awk -v path=$key -f json.awk weather.json
 }
 
 get_minute(){
